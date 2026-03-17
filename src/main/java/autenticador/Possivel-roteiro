@@ -1,0 +1,136 @@
+# Roteiro do Vídeo – Trabalho Vivencial: Autenticador Digital com AVL e SHA-1
+**Tempo máximo: 9 minutos | UNIFOR – Polo EAD – Estruturas de Dados**
+
+---
+
+## 🎬 MEMBRO 1 – Introdução + Explicação do Problema
+**Tempo sugerido: 1 min 30 seg**
+
+> "Meu nome é [Nome do Membro 1], matrícula [Matrícula]."
+
+Olá a todos! Neste vídeo apresentaremos o nosso Trabalho Vivencial da disciplina de Estruturas de Dados, orientado pelo professor Paulo Cirillo Souza Barbosa, da Universidade de Fortaleza — UNIFOR, Polo EAD.
+
+O tema do nosso trabalho é a implementação de um **autenticador digital de documentos textuais**. Mas o que é isso?
+
+Quando um documento eletrônico precisa ser autenticado — por exemplo, uma petição jurídica ou uma transação comercial — é necessário garantir que aquele documento é verdadeiro, que foi gerado por uma pessoa autorizada, e que não sofreu nenhuma alteração desde sua criação.
+
+Para isso, utilizamos funções matemáticas chamadas de **hashes criptográficos**: elas geram um código único para cada documento. Se qualquer caractere for alterado, esse código muda completamente.
+
+O nosso trabalho implementa esse sistema em Java, usando as principais estruturas de dados estudadas na disciplina: **lista dinâmica, árvore AVL e pilha**. Vou passar a palavra para o nosso próximo membro, que vai explicar cada uma dessas estruturas.
+
+---
+
+## 🎬 MEMBRO 2 – Estruturas Utilizadas: Lista, AVL e Pilha
+**Tempo sugerido: 1 min 45 seg**
+
+> "Meu nome é [Nome do Membro 2], matrícula [Matrícula]."
+
+Obrigado! Vou explicar as três estruturas de dados que utilizamos.
+
+A primeira é a **Lista Dinâmica** — implementada com a classe `ArrayList` do Java. Para cada linha do arquivo de texto, criamos uma lista para armazenar as palavras daquela linha. A principal vantagem é o acesso direto por índice, o que nos permite percorrer as palavras na ordem reversa com eficiência em O(1) por acesso.
+
+A segunda é a **Árvore AVL** — uma árvore binária de busca auto-balanceada. Ela garante que a diferença de altura entre os filhos de qualquer nó seja no máximo 1, mantendo operações de busca e inserção em tempo O(log n) mesmo no pior caso. Na nossa implementação, cada nó armazena uma palavra, e as palavras são organizadas em ordem lexicográfica pelo método `compareToIgnoreCase`. Além disso, duplicatas são automaticamente ignoradas.
+
+A terceira estrutura é a **Pilha** — implementada com a classe `Stack` do Java. Após construir a árvore AVL de cada linha, empilhamos a árvore. Ao final, desempilhamos todas as árvores em ordem inversa à de construção — comportamento LIFO — e geramos o hash de cada uma. Isso faz com que a última linha do arquivo tenha seu hash calculado primeiro.
+
+---
+
+## 🎬 MEMBRO 3 – Lógica de Inserção Reversa e Balanceamento
+**Tempo sugerido: 1 min 30 seg**
+
+> "Meu nome é [Nome do Membro 3], matrícula [Matrícula]."
+
+Perfeito! Vou explicar em detalhes como funciona a inserção reversa e o balanceamento.
+
+Pegamos a linha do arquivo, dividimos em palavras e as colocamos na `ArrayList`. Depois percorremos essa lista **do último elemento até o primeiro**, inserindo cada palavra na árvore AVL.
+
+Por exemplo, para a linha `"Eu amo muito essa disciplina"`, a ordem de inserção na árvore é: `disciplina, essa, muito, amo, Eu`.
+
+Durante cada inserção, a AVL realiza comparações lexicográficas com `compareToIgnoreCase`. Se a palavra for menor, vai para a esquerda; se for maior, vai para a direita; se for igual, é ignorada.
+
+Após cada inserção, verificamos o **fator de balanceamento** de cada nó ancestral. Se ele sair do intervalo [-1, +1], aplicamos uma rotação. Há quatro casos:
+- **LL**: rotação simples à direita
+- **RR**: rotação simples à esquerda  
+- **LR**: rotação dupla esquerda-direita
+- **RL**: rotação dupla direita-esquerda
+
+O balanceamento garante que a árvore nunca degenere e que o cálculo de hash seja realizado de forma eficiente e estruturada.
+
+---
+
+## 🎬 MEMBRO 4 – Lógica Completa do Hash com Exemplo
+**Tempo sugerido: 2 minutos**
+
+> "Meu nome é [Nome do Membro 4], matrícula [Matrícula]."
+
+Agora vou explicar a parte mais importante: o cálculo do hash SHA-1 da árvore.
+
+O SHA-1 é uma função criptográfica que gera um resumo de 40 caracteres hexadecimais para qualquer entrada. Ele é determinístico e possui o chamado **efeito avalanche** — qualquer mudança mínima no texto muda o hash completamente.
+
+A lógica de cálculo segue esta regra:
+- **Nó folha**: `hash = SHA-1(valor_do_nó)`
+- **Nó com apenas um filho**: `hash = SHA-1(hashFilho + SHA-1(valor_do_nó))`
+- **Nó com dois filhos**: `hash = SHA-1(hashEsquerdo + hashDireito + SHA-1(valor_do_nó))`
+
+Se um lado não tem filho, aquele hash simplesmente não é concatenado. Nunca aplicamos hash a `null`.
+
+Usando o exemplo do PDF — linha "Eu amo muito essa disciplina" — a árvore resultante é:
+```
+          essa
+         /    \
+   disciplina   muito
+   /            /
+  amo           Eu
+```
+
+Calculamos:
+- `h(amo)` = SHA-1("amo") — é folha
+- `h(Eu)` = SHA-1("Eu") — é folha
+- `h(disciplina)` = SHA-1(h(amo) + SHA-1("disciplina")) — só tem filho esquerdo
+- `h(muito)` = SHA-1(h(Eu) + SHA-1("muito")) — só tem filho esquerdo
+- `h(essa)` = SHA-1(h(disciplina) + h(muito) + SHA-1("essa")) — tem ambos os filhos
+
+O resultado final é `f44040deec0de6e3100f7ff772bb7a25646e71ed` — exatamente igual ao esperado no PDF!
+
+---
+
+## 🎬 MEMBRO 5 – Demonstração da Execução do Código
+**Tempo sugerido: 1 min 15 seg**
+
+> "Meu nome é [Nome do Membro 5], matrícula [Matrícula]."
+
+Agora vou demonstrar a execução do código.
+
+Nosso projeto é composto por três arquivos Java:
+- `Node.java` — define o nó da AVL com os atributos `dado`, `esquerdo`, `direito` e `altura`
+- `ArvoreAVL.java` — implementa toda a lógica da AVL: inserção com balanceamento e o método `computarHash()`
+- `Main.java` — é a classe principal que lê o arquivo, cria as listas, insere nas árvores, empilha e desempilha gerando os hashes
+
+Para compilar e executar:
+```bash
+javac Node.java ArvoreAVL.java Main.java
+java Main
+```
+
+O programa lê o arquivo `documento.txt` — que possui 35 linhas em português sobre autenticação digital — e imprime 35 hashes, um por linha, sem qualquer texto adicional. A saída começa com o hash da última linha do arquivo (linha 35) e termina com o hash da primeira linha (linha 1), devido ao comportamento LIFO da pilha.
+
+---
+
+## 🎬 MEMBRO 6 – Conclusão e Resultados
+**Tempo sugerido: 1 minuto**
+
+> "Meu nome é [Nome do Membro 6], matrícula [Matrícula]."
+
+Para encerrar, vou apresentar as conclusões do trabalho.
+
+Implementamos com sucesso um autenticador digital utilizando as principais estruturas de dados da disciplina. A combinação de **Lista Dinâmica**, **Árvore AVL** e **Pilha**, aliada ao **SHA-1**, resultou em um sistema capaz de gerar códigos de autenticação únicos para cada linha de um documento textual.
+
+A **validação com o exemplo do PDF** confirma a corretude da implementação: o hash calculado para "Eu amo muito essa disciplina" é exatamente `f44040deec0de6e3100f7ff772bb7a25646e71ed`, como especificado pelo professor.
+
+Este trabalho nos permitiu aplicar na prática conceitos fundamentais como balanceamento de árvores, estruturas LIFO e funções de dispersão criptográfica — demonstrando a relevância dessas estruturas em sistemas reais de segurança da informação.
+
+Agradecemos ao professor Paulo Cirillo pela orientação e à UNIFOR pelo suporte. Obrigado a todos!
+
+---
+
+**Total estimado: ~9 minutos**
