@@ -1,12 +1,16 @@
 package autenticador.avl;
 
 public class NoAvl {
-public String palavra;
-public NoAvl esquerdo, direito;
-public int altura;
+    
+    public String palavra;
+    public NoAvl esquerdo;
+    public NoAvl direito;
+    public int altura;
 
-public NoAvl(String d) {
-this.palavra = d;
-this.altura = 1;
+    public NoAvl(String palavra) {
+        this.palavra = palavra;
+        this.altura = 1;
+        this.esquerdo = null;
+        this.direito = null;
     }
 }
